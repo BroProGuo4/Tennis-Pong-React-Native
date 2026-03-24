@@ -5,7 +5,7 @@
 ```
 npx create-expo-app@latest gomoku-app
 cd gomoku-app
-npx expo start
+npx expo start -c
 
 ?
 npm install -g eas-cli
@@ -19,6 +19,12 @@ npx expo prebuild --platform android or npx expo prebuild --clean --platform and
 cd android
 ./gradlew assembleRelease
 ```
+
+## How to test the app locally on laptop via simulator before building apk:
+```
+npx expo start -c
+```
+Then, click "i" to test in ios simulator.
 
 ## After making changes, how to build subsequent apk:
 ```

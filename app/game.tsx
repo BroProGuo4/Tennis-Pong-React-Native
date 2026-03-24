@@ -3,13 +3,12 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Dimensions,
-  PanResponder,
   SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import { AIKey, COURTS, CourtKey } from '../constants/courts';
 import {
@@ -66,49 +65,49 @@ export default function GameScreen() {
     };
   }, [startLoop]);
 
-  // ── P1 PanResponder (bottom half of screen) ──
-  const p1Pan = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (evt) => {
-        const x = evt.nativeEvent.pageX / SCALE;
-        p1TouchRef.current = x;
-      },
-      onPanResponderMove: (evt) => {
-        const x = evt.nativeEvent.pageX / SCALE;
-        p1TouchRef.current = x;
-      },
-      onPanResponderRelease: () => {
-        p1TouchRef.current = null;
-      },
-      onPanResponderTerminate: () => {
-        p1TouchRef.current = null;
-      },
-    })
-  ).current;
+  // // ── P1 PanResponder (bottom half of screen) ──
+  // const p1Pan = useRef(
+  //   PanResponder.create({
+  //     onStartShouldSetPanResponder: () => true,
+  //     onMoveShouldSetPanResponder: () => true,
+  //     onPanResponderGrant: (evt) => {
+  //       const x = evt.nativeEvent.pageX / SCALE;
+  //       p1TouchRef.current = x;
+  //     },
+  //     onPanResponderMove: (evt) => {
+  //       const x = evt.nativeEvent.pageX / SCALE;
+  //       p1TouchRef.current = x;
+  //     },
+  //     onPanResponderRelease: () => {
+  //       p1TouchRef.current = null;
+  //     },
+  //     onPanResponderTerminate: () => {
+  //       p1TouchRef.current = null;
+  //     },
+  //   })
+  // ).current;
 
-  // ── P2 PanResponder (top half, local 2P only) ──
-  const p2Pan = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (evt) => {
-        const x = evt.nativeEvent.pageX / SCALE;
-        p2TouchRef.current = x;
-      },
-      onPanResponderMove: (evt) => {
-        const x = evt.nativeEvent.pageX / SCALE;
-        p2TouchRef.current = x;
-      },
-      onPanResponderRelease: () => {
-        p2TouchRef.current = null;
-      },
-      onPanResponderTerminate: () => {
-        p2TouchRef.current = null;
-      },
-    })
-  ).current;
+  // // ── P2 PanResponder (top half, local 2P only) ──
+  // const p2Pan = useRef(
+  //   PanResponder.create({
+  //     onStartShouldSetPanResponder: () => true,
+  //     onMoveShouldSetPanResponder: () => true,
+  //     onPanResponderGrant: (evt) => {
+  //       const x = evt.nativeEvent.pageX / SCALE;
+  //       p2TouchRef.current = x;
+  //     },
+  //     onPanResponderMove: (evt) => {
+  //       const x = evt.nativeEvent.pageX / SCALE;
+  //       p2TouchRef.current = x;
+  //     },
+  //     onPanResponderRelease: () => {
+  //       p2TouchRef.current = null;
+  //     },
+  //     onPanResponderTerminate: () => {
+  //       p2TouchRef.current = null;
+  //     },
+  //   })
+  // ).current;
 
   const togglePause = () => {
     stateRef.current = {
@@ -145,20 +144,40 @@ export default function GameScreen() {
 
       {/* Touch zones */}
       <View style={{ width: SCREEN_WIDTH, height: scaledH }}>
-        {/* P2 touch zone (top half, local 2P) */}
-        {isLocal && (
-          <View
-            {...p2Pan.panHandlers}
-            style={[styles.touchZone, { top: 0, height: scaledH / 2 }]}
-            pointerEvents="box-only"
-          />
-        )}
-        {/* P1 touch zone (bottom half) */}
-        <View
-          {...p1Pan.panHandlers}
-          style={[styles.touchZone, { bottom: 0, height: scaledH / 2 }]}
-          pointerEvents="box-only"
-        />
+      <View
+        style={[styles.touchZone, { top: 0, height: scaledH }]}
+        onStartShouldSetResponder={() => true}
+        onMoveShouldSetResponder={() => true}
+        onResponderGrant={(evt) => {
+          evt.nativeEvent.touches.forEach((t) => {
+            if (t.pageY / SCALE > GAME_HEIGHT / 2) {
+              p1TouchRef.current = t.pageX / SCALE;
+            } else {
+              p2TouchRef.current = t.pageX / SCALE;
+            }
+          });
+        }}
+        onResponderMove={(evt) => {
+          evt.nativeEvent.touches.forEach((t) => {
+            if (t.pageY / SCALE > GAME_HEIGHT / 2) {
+              p1TouchRef.current = t.pageX / SCALE;
+            } else {
+              p2TouchRef.current = t.pageX / SCALE;
+            }
+          });
+        }}
+        onResponderRelease={(evt) => {
+          const touches = evt.nativeEvent.touches;
+          const hasTop = touches.some((t) => t.pageY / SCALE <= GAME_HEIGHT / 2);
+          const hasBottom = touches.some((t) => t.pageY / SCALE > GAME_HEIGHT / 2);
+          if (!hasTop) p2TouchRef.current = null;
+          if (!hasBottom) p1TouchRef.current = null;
+        }}
+        onResponderTerminate={() => {
+          p1TouchRef.current = null;
+          p2TouchRef.current = null;
+        }}
+      />
 
         <Canvas style={{ width: SCREEN_WIDTH, height: scaledH }}>
           {/* Floor */}
@@ -259,7 +278,7 @@ export default function GameScreen() {
               y={s.ballDestY * SCALE}
               width={10 * SCALE}
               height={10 * SCALE}
-              color="rgba(255,80,80,0.7)"
+              color="rgba(180,180,180,0.35)"
             />
           )}
 
@@ -318,6 +337,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center', // add this
   },
   hud: {
     width: '100%',
@@ -326,6 +346,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 8,
+    paddingTop: 40,
   },
   hudBtn: {
     width: 36,
