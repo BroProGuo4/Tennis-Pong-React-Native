@@ -1,21 +1,15 @@
 # Tennis Pong — React Native (Expo)
 > by Brooklyn Guo
 
-## How to build for first time:
+## How to create from scratch a react native project:
 ```
 npx create-expo-app@latest gomoku-app
 cd gomoku-app
-npx expo start -c
+```
 
-?
-npm install -g eas-cli
-eas login
-eas build:configure
-eas build -p android --profile preview
-npx expo run:android ?
-?
-
-npx expo prebuild --platform android or npx expo prebuild --clean --platform android
+## How to build for first time:
+```
+npx expo prebuild --clean --platform android
 cd android
 ./gradlew assembleRelease
 ```
@@ -28,9 +22,21 @@ Then, click "i" to test in ios simulator.
 
 ## After making changes, how to build subsequent apk:
 ```
+rm -rf android/
+npx expo prebuild --clean --platform android
 cd android
 ./gradlew assembleRelease
 ```
+
+## Additional commands to build using EAS/Expo Go if you want to put the build on the Expo server queue:
+```
+npm install -g eas-cli
+eas login
+eas build:configure
+eas build -p android --profile preview
+npx expo run:android ?
+```
+
 
 ## Project Structure
 
