@@ -6,16 +6,23 @@
 npx create-expo-app@latest gomoku-app
 cd gomoku-app
 npx expo start
+
+?
 npm install -g eas-cli
 eas login
 eas build:configure
 eas build -p android --profile preview
-npx expo run:android
+npx expo run:android ?
+?
+
+npx expo prebuild --platform android or npx expo prebuild --clean --platform android
+cd android
 ./gradlew assembleRelease
 ```
 
 ## After making changes, how to build subsequent apk:
 ```
+cd android
 ./gradlew assembleRelease
 ```
 
