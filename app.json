@@ -5,11 +5,16 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
+    "icon": "./assets/appstore.png",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.brooklynguo.tennispong"
     },
     "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/appstore.png",
+        "backgroundColor": "#FFFFFF"
+      },
       "package": "com.brooklynguo.tennispong"
     },
     "plugins": [
