@@ -1,50 +1,135 @@
-# Welcome to your Expo app 👋
+# Tennis Pong — React Native (Expo)
+> by Brooklyn Guo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+## How to build for first time:
+```
+npx create-expo-app@latest gomoku-app
+cd gomoku-app
+npx expo start
+npm install -g eas-cli
+eas login
+eas build:configure
+eas build -p android --profile preview
+npx expo run:android
+./gradlew assembleRelease
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## After making changes, how to build subsequent apk:
+```
+./gradlew assembleRelease
+```
 
-## Learn more
+## Project Structure
 
-To learn more about developing your project with Expo, look at the following resources:
+```
+TennisPong/
+├── app/
+│   ├── _layout.tsx       ← Expo Router root layout
+│   ├── index.tsx         ← Home screen (court picker + opponent selector)
+│   └── game.tsx          ← Game screen (canvas + touch controls)
+├── constants/
+│   └── courts.ts         ← Court colors + AI opponent definitions
+├── hooks/
+│   └── gameLogic.ts      ← All game physics + AI logic (ported from Python)
+├── app.json
+├── babel.config.js
+├── package.json
+└── tsconfig.json
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+---
 
-## Join the community
+## Setup Commands
 
-Join our community of developers creating universal apps.
+### Step 1 — Create the Expo project
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+npx create-expo-app@latest TennisPong --template blank-typescript
+cd TennisPong
+```
+
+### Step 2 — Install dependencies
+
+```bash
+npx expo install expo-router react-native-screens react-native-safe-area-context
+npx expo install @shopify/react-native-skia
+npx expo install react-native-reanimated
+```
+
+### Step 3 — Replace generated files with the provided source files
+
+Copy all files from this repo into the project root, replacing any that already exist:
+- `app/_layout.tsx`
+- `app/index.tsx`
+- `app/game.tsx`
+- `constants/courts.ts`
+- `hooks/gameLogic.ts`
+- `app.json` (update your bundle ID if needed)
+- `babel.config.js`
+- `tsconfig.json`
+
+### Step 4 — Update app.json entry point
+
+Make sure your `package.json` has this:
+```json
+"main": "expo-router/entry"
+```
+
+### Step 5 — Run the app
+
+```bash
+# Start dev server
+npx expo start
+
+# Then press:
+#   i  →  iOS Simulator
+#   a  →  Android Emulator
+#   Scan QR code with Expo Go on your phone
+```
+
+---
+
+## How to Play
+
+### Home Screen
+- **SELECT COURT** — swipe through the horizontal court chips to pick a surface color (all 11 real-world courts from your Python version are here: AO, USO, Wimbledon, Roland Garros, etc.)
+- **SELECT OPPONENT** — tap one of the 8 opponent cards:
+  - 👥 Local 2 Player — both players use touch/drag on the same device
+  - 🟢 Basic — returns to center
+  - 👻 Phantom — cross-court & inside-out only
+  - 🎯 Sentinel — down the line only
+  - ⚡ Titan — targets the open side with randomness
+  - 🔥 Rival — hits perfectly into the open corner
+  - 💀 Teleporter — unbeatable, teleports to every ball
+  - 🕶️ Matrix — reads your movement, hits the opposite way
+- Tap **PLAY** to start
+
+### In Game
+- **P1 (you, bottom paddle)** — drag your finger anywhere in the bottom half of the screen
+- **P2 (top paddle, local 2P)** — drag in the top half of the screen
+- **⏸ / ▶** — pause/resume
+- **✕** — quit to home screen
+- The stats bar at the bottom shows current rally length and ball speed
+
+---
+
+## AI Logic (ported 1:1 from Python)
+
+| AI | Strategy |
+|---|---|
+| Basic | Tracks ball to center of paddle |
+| Phantom | Always aims cross-court / inside-out |
+| Sentinel | Always aims down the line |
+| Titan | Targets open side with 10–80% randomness |
+| Rival | Perfectly targets open corner, bounded |
+| Teleporter | Instantly teleports paddle to ball position |
+| Matrix | Reads opponent velocity → hits the opposite direction |
+
+---
+
+## Notes
+- The game canvas is 400×600 (matching your Python constants) and scales to fit any screen width
+- Ball physics, relative hit calculation, and speed increment are all ported exactly from your Python code
+- Touch/drag maps finger X position → paddle center, matching the feel of arrow-key control
+
+
