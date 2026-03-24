@@ -14,6 +14,11 @@ cd android
 ./gradlew assembleRelease
 ```
 
+### You can find the Release Build in the folder path: 
+```
+TennisPong/android/app/build/outputs/apk/release/app-release.apk
+```
+
 ## How to test the app locally on laptop via simulator before building apk:
 ```
 npx expo start -c
