@@ -22,6 +22,10 @@ TennisPong/android/app/build/outputs/apk/release/app-release.apk
 ## How to test the app locally on laptop via simulator before building apk:
 ```
 npx expo start -c
+
+sometimes, need to use the following for a native dev build, for things like asyncStorage to work:
+npx expo run:android
+npx expo run:ios
 ```
 Then, click "i" to test in ios simulator.
 
